@@ -1,38 +1,133 @@
-import { type User, type InsertUser } from "@shared/schema";
-import { randomUUID } from "crypto";
-
-// modify the interface with any CRUD methods
-// you might need
+import { 
+  users, sweets, purchases,
+  type User, type InsertUser, 
+  type Sweet, type InsertSweet,
+  type Purchase, type InsertPurchase,
+  type Category
+} from "@shared/schema";
+import { db } from "./db";
+import { eq, ilike, and, gte, lte, sql } from "drizzle-orm";
 
 export interface IStorage {
   getUser(id: string): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
-  createUser(user: InsertUser): Promise<User>;
+  createUser(user: InsertUser & { role?: "user" | "admin" }): Promise<User>;
+  
+  getAllSweets(): Promise<Sweet[]>;
+  getSweetById(id: string): Promise<Sweet | undefined>;
+  searchSweets(params: {
+    name?: string;
+    category?: Category;
+    minPrice?: string;
+    maxPrice?: string;
+  }): Promise<Sweet[]>;
+  createSweet(sweet: InsertSweet): Promise<Sweet>;
+  updateSweet(id: string, sweet: Partial<InsertSweet>): Promise<Sweet | undefined>;
+  deleteSweet(id: string): Promise<boolean>;
+  updateSweetQuantity(id: string, quantityChange: number): Promise<Sweet | undefined>;
+  
+  createPurchase(purchase: InsertPurchase): Promise<Purchase>;
 }
 
-export class MemStorage implements IStorage {
-  private users: Map<string, User>;
-
-  constructor() {
-    this.users = new Map();
-  }
-
+export class DatabaseStorage implements IStorage {
   async getUser(id: string): Promise<User | undefined> {
-    return this.users.get(id);
+    const [user] = await db.select().from(users).where(eq(users.id, id));
+    return user || undefined;
   }
 
   async getUserByUsername(username: string): Promise<User | undefined> {
-    return Array.from(this.users.values()).find(
-      (user) => user.username === username,
-    );
+    const [user] = await db.select().from(users).where(eq(users.username, username));
+    return user || undefined;
   }
 
-  async createUser(insertUser: InsertUser): Promise<User> {
-    const id = randomUUID();
-    const user: User = { ...insertUser, id };
-    this.users.set(id, user);
+  async createUser(insertUser: InsertUser & { role?: "user" | "admin" }): Promise<User> {
+    const [user] = await db
+      .insert(users)
+      .values({
+        ...insertUser,
+        role: insertUser.role || "user",
+      })
+      .returning();
     return user;
+  }
+
+  async getAllSweets(): Promise<Sweet[]> {
+    return db.select().from(sweets);
+  }
+
+  async getSweetById(id: string): Promise<Sweet | undefined> {
+    const [sweet] = await db.select().from(sweets).where(eq(sweets.id, id));
+    return sweet || undefined;
+  }
+
+  async searchSweets(params: {
+    name?: string;
+    category?: Category;
+    minPrice?: string;
+    maxPrice?: string;
+  }): Promise<Sweet[]> {
+    const conditions = [];
+    
+    if (params.name) {
+      conditions.push(ilike(sweets.name, `%${params.name}%`));
+    }
+    if (params.category) {
+      conditions.push(eq(sweets.category, params.category));
+    }
+    if (params.minPrice) {
+      conditions.push(gte(sweets.price, params.minPrice));
+    }
+    if (params.maxPrice) {
+      conditions.push(lte(sweets.price, params.maxPrice));
+    }
+
+    if (conditions.length === 0) {
+      return this.getAllSweets();
+    }
+
+    return db.select().from(sweets).where(and(...conditions));
+  }
+
+  async createSweet(insertSweet: InsertSweet): Promise<Sweet> {
+    const [sweet] = await db
+      .insert(sweets)
+      .values(insertSweet)
+      .returning();
+    return sweet;
+  }
+
+  async updateSweet(id: string, updates: Partial<InsertSweet>): Promise<Sweet | undefined> {
+    const [sweet] = await db
+      .update(sweets)
+      .set(updates)
+      .where(eq(sweets.id, id))
+      .returning();
+    return sweet || undefined;
+  }
+
+  async deleteSweet(id: string): Promise<boolean> {
+    const result = await db.delete(sweets).where(eq(sweets.id, id)).returning();
+    return result.length > 0;
+  }
+
+  async updateSweetQuantity(id: string, quantityChange: number): Promise<Sweet | undefined> {
+    const [sweet] = await db
+      .update(sweets)
+      .set({
+        quantity: sql`${sweets.quantity} + ${quantityChange}`,
+      })
+      .where(eq(sweets.id, id))
+      .returning();
+    return sweet || undefined;
+  }
+
+  async createPurchase(insertPurchase: InsertPurchase): Promise<Purchase> {
+    const [purchase] = await db
+      .insert(purchases)
+      .values(insertPurchase)
+      .returning();
+    return purchase;
   }
 }
 
-export const storage = new MemStorage();
+export const storage = new DatabaseStorage();
