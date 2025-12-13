@@ -246,6 +246,15 @@ export async function registerRoutes(
       return res.status(500).json({ message: "Internal server error" });
     }
   });
+  app.get("/api/user/purchases", authenticateToken, async (req: AuthRequest, res) => {
+    try {
+      const history = await storage.getUserPurchases(req.user!.id);
+      return res.json(history);
+    } catch (error) {
+      console.error("Fetch history error:", error);
+      return res.status(500).json({ message: "Failed to fetch history" });
+    }
+  });
 
   return httpServer;
 }

@@ -6,7 +6,7 @@ import {
   type Category
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, ilike, and, gte, lte, sql } from "drizzle-orm";
+import { eq, ilike, and, gte, lte, sql, desc } from "drizzle-orm"; // Added 'desc'
 
 export interface IStorage {
   getUser(id: string): Promise<User | undefined>;
@@ -27,6 +27,7 @@ export interface IStorage {
   updateSweetQuantity(id: string, quantityChange: number): Promise<Sweet | undefined>;
   
   createPurchase(purchase: InsertPurchase): Promise<Purchase>;
+  getUserPurchases(userId: string): Promise<(Purchase & { sweet: Sweet })[]>; // Added
 }
 
 export class DatabaseStorage implements IStorage {
@@ -127,6 +128,17 @@ export class DatabaseStorage implements IStorage {
       .values(insertPurchase)
       .returning();
     return purchase;
+  }
+
+  async getUserPurchases(userId: string): Promise<(Purchase & { sweet: Sweet })[]> {
+    const result = await db.query.purchases.findMany({
+      where: eq(purchases.userId, userId),
+      with: {
+        sweet: true
+      },
+      orderBy: (purchases) => [desc(purchases.purchasedAt)],
+    });
+    return result as (Purchase & { sweet: Sweet })[];
   }
 }
 

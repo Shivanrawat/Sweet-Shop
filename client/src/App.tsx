@@ -11,6 +11,7 @@ import Login from "@/pages/login";
 import Register from "@/pages/register";
 import Shop from "@/pages/shop";
 import Admin from "@/pages/admin";
+import Profile from "@/pages/profile";
 import NotFound from "@/pages/not-found";
 
 function ProtectedRoute({ component: Component }: { component: () => JSX.Element }) {
@@ -61,6 +62,9 @@ function Router() {
       <Route path="/register" component={Register} />
       <Route path="/shop">
         <ProtectedRoute component={Shop} />
+      </Route>
+      <Route path="/profile">
+        <ProtectedRoute component={Profile} />
       </Route>
       <Route path="/admin">
         <AdminRoute component={Admin} />

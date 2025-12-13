@@ -43,7 +43,7 @@ export default function Login() {
         title: "Welcome back!",
         description: `Logged in as ${response.user.username}`,
       });
-      setLocation("/shop");
+      setLocation("/");
     } catch (error: any) {
       toast({
         title: "Login failed",

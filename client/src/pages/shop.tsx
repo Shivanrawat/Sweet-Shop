@@ -34,10 +34,15 @@ export default function Shop() {
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 100]);
   const [purchasingId, setPurchasingId] = useState<string | null>(null);
 
-  const { data: sweets, isLoading, error } = useQuery<Sweet[]>({
+  // FIX: Removed <Sweet[]> generic and added explicit queryFn
+  const { data, isLoading, error } = useQuery({
     queryKey: ["/api/sweets"],
+    queryFn: async () => await apiRequest("GET", "/api/sweets"),
     enabled: !!token,
   });
+
+  // FIX: Cast data to Sweet[]
+  const sweets = data as Sweet[] | undefined;
 
   const maxPrice = useMemo(() => {
     if (!sweets || sweets.length === 0) return 100;
@@ -65,14 +70,14 @@ export default function Shop() {
     mutationFn: async (sweet: Sweet) => {
       return apiRequest("POST", `/api/sweets/${sweet.id}/purchase`, { quantity: 1 });
     },
-    onSuccess: (_, sweet) => {
+    onSuccess: (_: unknown, sweet: Sweet) => {
       queryClient.invalidateQueries({ queryKey: ["/api/sweets"] });
       toast({
-        title: "Purchase successful!",
-        description: `You bought 1x ${sweet.name}`,
+      title: "Purchase successful!",
+      description: `You bought 1x ${sweet.name}`,
       });
     },
-    onError: (error: any) => {
+    onError: (error: Error) => {
       toast({
         title: "Purchase failed",
         description: error.message || "Could not complete purchase",

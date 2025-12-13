@@ -33,6 +33,11 @@ A full-stack Sweet Shop Management System built with TDD principles. This applic
 - **State Management**: TanStack Query (React Query)
 - **Styling**: Tailwind CSS with shadcn/ui components
 - **Form Handling**: React Hook Form with Zod validation
+## My AI Usage
+
+### Tools Used
+- **Google Gemini**: Used for architectural advice, refactoring existing components, and generating the "Purchase History" logic.
+- **Replit Agent**: Used for initial project scaffolding, boilerplate generation, and setting up the database connection.
 
 ## API Endpoints
 
