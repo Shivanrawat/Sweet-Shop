@@ -1,5 +1,7 @@
 # Sweet Shop Management System
 
+**🚀 Live Demo:** [https://sweet-shop-cp2v.onrender.com](https://sweet-shop-cp2v.onrender.com)
+
 A full-stack Sweet Shop Management System built with TDD principles. This application features user authentication with JWT tokens, a PostgreSQL database for data persistence, and a modern React frontend.
 
 ## Features
@@ -33,11 +35,6 @@ A full-stack Sweet Shop Management System built with TDD principles. This applic
 - **State Management**: TanStack Query (React Query)
 - **Styling**: Tailwind CSS with shadcn/ui components
 - **Form Handling**: React Hook Form with Zod validation
-## My AI Usage
-
-### Tools Used
-- **Google Gemini**: Used for architectural advice, refactoring existing components, and generating the "Purchase History" logic.
-- **Replit Agent**: Used for initial project scaffolding, boilerplate generation, and setting up the database connection.
 
 ## API Endpoints
 
@@ -68,94 +65,3 @@ A full-stack Sweet Shop Management System built with TDD principles. This applic
 ```bash
 git clone <repository-url>
 cd sweet-shop
-```
-
-2. Install dependencies:
-```bash
-npm install
-```
-
-3. Set up environment variables:
-```bash
-# Required environment variables
-DATABASE_URL=postgresql://user:password@host:port/database
-SESSION_SECRET=your-secure-session-secret
-```
-
-4. Push the database schema:
-```bash
-npm run db:push
-```
-
-5. Start the development server:
-```bash
-npm run dev
-```
-
-The application will be available at `http://localhost:5000`.
-
-### Creating an Admin User
-
-By default, new users are created with the "user" role. To create an admin user, you can either:
-1. Manually update a user's role in the database
-2. Modify the registration endpoint temporarily to create admin users
-
-## Project Structure
-
-```
-├── client/                 # React frontend
-│   ├── src/
-│   │   ├── components/     # Reusable UI components
-│   │   ├── pages/          # Page components
-│   │   ├── lib/            # Utilities (auth, theme, queryClient)
-│   │   └── hooks/          # Custom React hooks
-│   └── index.html
-├── server/                 # Express backend
-│   ├── auth.ts             # JWT authentication middleware
-│   ├── db.ts               # Database connection
-│   ├── routes.ts           # API route handlers
-│   └── storage.ts          # Database operations
-├── shared/                 # Shared types and schemas
-│   └── schema.ts           # Drizzle schema and Zod validation
-└── README.md
-```
-
-## My AI Usage
-
-### Tools Used
-- **Replit Agent (Claude)**: Used throughout the development process for code generation, debugging, and architecture decisions.
-
-### How AI Was Used
-
-1. **Schema Design**: AI helped design the database schema including users with roles, sweets with categories, and purchase tracking relationships.
-
-2. **API Structure**: AI assisted in structuring RESTful API endpoints following best practices for authentication, CRUD operations, and inventory management.
-
-3. **Frontend Components**: AI generated React components including:
-   - Authentication forms with validation
-   - Sweet cards with purchase functionality
-   - Search and filter interfaces
-   - Admin dashboard with CRUD operations
-   - Restock dialog for inventory management
-
-4. **JWT Authentication**: AI implemented the complete JWT authentication flow including token generation, middleware protection, and role-based authorization.
-
-5. **Styling & UX**: AI applied Tailwind CSS styling following design guidelines for a professional, responsive user interface with dark mode support.
-
-### Reflection on AI Impact
-
-Using AI significantly accelerated the development process by:
-- Generating boilerplate code quickly, allowing focus on business logic
-- Providing consistent code patterns across the application
-- Catching potential issues early through comprehensive error handling
-- Ensuring type safety with TypeScript and Zod validation throughout
-
-The AI was particularly helpful in creating a cohesive design system and ensuring all components followed the established patterns. However, manual review and testing were essential to verify the generated code worked correctly in the specific context of this application.
-
-## Screenshots
-
-*Screenshots will be added after deployment*
-
-## License
-
-MIT License
